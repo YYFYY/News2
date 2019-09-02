@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SpringBoot.main.dao.admin.UserMapper">
+
+	<select id="findUserByUsername" parameterType="string"
+		resultType="user">
+		select * from user where username=#{username}
+	</select>
+
+	<!-- 分页查找用户列表 -->
+	<select id="findList" parameterType="map" resultType="user">
+		select * from user
+		<where>
+			<if test="username!=null">
+				and username like '%${username}%'
+			</if>
+			<if test="roleId!=null">
+				and roleId=#{roleId}
+			</if>
+			<if test="sex!=null">
+				and sex =#{sex}
+			</if>
+			</where>
+			<if test="offset!=null and pageSize!=null">
+				limit #{offset},#{pageSize}
+			</if>
+		
+	</select>
+
+
+	<insert id="add" parameterType="user">
+		insert into user (username,password,sex,roleId,age,address,photo)
+		values(#{username},#{password},#{sex},#{roleId},#{age},#{address},#{photo})
+
+	</insert>
+
+	<update id="edit" parameterType="user">
+		update user set
+		username=#{username},sex=#{sex},age=#{age},roleId=#{roleId},address=#{address},photo=#{photo}
+		where id=#{id}
+
+	</update>
+
+	<delete id="delete" parameterType="string">
+		delete from user where id in(${value})
+	</delete>
+
+ 	<update id="editPassword" parameterType="user">
+ 	update user set
+		password=#{password}
+		where id=#{id}
+ 	</update>
+ 	
+ 	
+ 	<select id="getTotal"  parameterType="map" resultType="int">
+ 		select count(*) from user
+		<where>
+			<if test="username!=null">
+				and username like '%${username}%'
+			</if>
+			<if test="roleId!=null">
+				and roleId=#{roleId}
+			</if>
+			<if test="sex!=null">
+				and sex =#{sex}
+			</if>
+			</where>
+			<if test="offset!=null and pageSize!=null">
+				limit #{offset},#{pageSize}
+			</if>
+		
+ 	</select>
+</mapper>
+

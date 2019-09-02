@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SpringBoot.main.dao.admin.MenuMapper">
+
+	<insert id="add" parameterType="menu">
+		insert into menu (parentId,name,url,icon)
+		values(#{parentId},#{name},#{url},#{icon})
+	</insert>
+
+	<select id="findMenusByPage" parameterType="map"
+		resultType="menu">
+		select * from menu
+		<where>
+			<if test="parentId!=null">
+				and parentId=#{parentId}
+			</if>
+			<if test="name!=null">
+				and name like '%${name}%'
+			</if>
+		</where>
+		<if test="offset!=null and pageSize!=null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+
+	<select id="findTotalByName" parameterType="map"
+		resultType="int">
+		select count(*) from menu
+		<where>
+			<if test="parentId!=null">
+				and parentId=#{parentId}
+			</if>
+			<if test="name!=null">
+				and name like '%${name}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="findTopList" resultType="menu">
+		select * from menu where parentId=0
+
+	</select>
+
+	<update id="edit" parameterType="menu">
+		update menu set name=#{name},url=#{url},parentId=#{parentId},icon=#{icon} where id=#{id}
+	</update>
+
+ 	<delete id="delete" parameterType="integer">
+ 	delete from menu where id=#{id}
+ 	</delete>
+ 	<select id="findLowerList" parameterType="integer" resultType="menu">
+		select * from menu where parentId=#{id}
+
+	</select>
+ 	
+ 	<select id="findMenuByIds" parameterType="String" resultType="menu">
+ 	select * from menu where id in(${value})
+ 	
+ 	</select>
+ 	
+ 	
+</mapper>
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SpringBoot.main.dao.admin.LogMapper">
+
+
+	<!-- 分页查找日志列表 -->
+	<select id="findList" parameterType="map" resultType="com.SpringBoot.main.pojo.admin.Log">
+		select * from log
+		<where>
+			<if test="content!=null">
+				and content like '%${content}%'
+			</if>
+ 		</where>
+			<if test="offset!=null and pageSize!=null">
+				limit #{offset},#{pageSize}
+			</if>
+		
+	</select>
+
+
+	<insert id="add" parameterType="com.SpringBoot.main.pojo.admin.Log">
+		insert into log (content,createTime)
+		values(#{content},#{createTime})
+
+	</insert>
+
+
+	<delete id="delete" parameterType="string">
+		delete from log where id in(${value})
+	</delete>
+
+ 	
+ 	<select id="getTotal"  parameterType="map" resultType="int">
+ 		select count(*) from log
+		<where>
+			<if test="content!=null">
+				and content like '%${content}%'
+			</if>
+ 		</where>
+			<if test="offset!=null and pageSize!=null">
+				limit #{offset},#{pageSize}
+			</if>
+		
+ 	</select>
+</mapper>
+

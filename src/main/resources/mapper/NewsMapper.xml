@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SpringBoot.main.dao.admin.NewsMapper">
+
+ 	<resultMap type="news" id="newsMap">
+ 	<id column="n_id" property="id"/>
+ 	<result column="n_categoryId" property="categoryId"/>
+ 	<result column="n_title" property="title"/>
+ 	<result column="n_abstrs" property="abstrs"/>
+ 	<result column="n_tags" property="tags"/>
+ 	<result column="n_photo" property="photo"/>
+ 	<result column="n_author" property="author"/>
+ 	<result column="n_content" property="content"/>
+ 	<result column="n_viewNumber" property="viewNumber"/>
+ 	<result column="n_commentNumber" property="commentNumber"/>
+ 	<result column="n_createTime" property="createTime"/>
+ 	<association property="newsCategory" javaType="NewsCategory">
+ 	<id column="nc_id" property="id"/>
+ 	<result column="nc_name" property="name"/>
+ 	<result column="nc_sort" property="sort"/>
+ 	</association>
+ 	
+ 	</resultMap>
+
+
+	<!-- 添加分类 -->
+	<insert id="add" parameterType="News">
+		insert into news(id,categoryId,title,abstrs,tags,photo,author,content,viewNumber,commentNumber,createTime) 
+		values(null,#{categoryId},#{title},#{abstrs},#{tags},#{photo},#{author},#{content},#{viewNumber},#{commentNumber},#{createTime})
+	</insert>
+	<!-- 修改分类 -->
+	<update id="edit" parameterType="News">
+		update news
+		<set>
+		<if test="categoryId!=null">categoryId=#{categoryId},</if>
+		<if test="title!=null">title=#{title},</if>
+		<if test="abstrs!=null">abstrs=#{abstrs},</if>
+		<if test="tags!=null">tags=#{tags},</if>
+		<if test="photo!=null">photo=#{photo},</if>
+		<if test="author!=null">author=#{author},</if>
+		<if test="content!=null">content=#{content},</if>
+		<if test="createTime!=null">createTime=#{createTime},</if>
+		</set>
+	 	 where id = #{id}
+	</update>
+	<!-- 删除分类 -->
+	<delete id="delete" parameterType="Long">
+		delete from news where id = #{id}
+	</delete>
+	<!-- 分页获取分类列表 -->
+	<select id="findList" parameterType="Map" resultMap="newsMap">
+		select n.id as n_id, n.categoryId as n_categoryId,n.title as n_title,n.abstrs as n_abstrs,n.tags as n_tags,n.photo as n_photo,
+		n.author as n_author,n.content as n_content,n.viewNumber as n_viewNumber,n.commentNumber as n_commentNumber,n.createTime as n_createTime,
+		nc.id as nc_id,nc.name as nc_name,nc.sort as nc_sort
+		from news as n,news_category as nc where n.categoryId = nc.id 
+		<if test="name != null">
+			and n.title like '%${name}%' 
+		</if>
+		<if test="author != null">
+			and n.author like '%${author}%' 
+		</if>
+		<if test="categoryId != null ">
+			and n.categoryId = #{categoryId}  
+		</if>
+		order by n.createTime desc 
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 获取单个分类信息 -->
+	<select id="find" parameterType="Long" resultMap="newsMap">
+		select n.id as n_id, n.categoryId as n_categoryId,n.title as n_title,n.abstrs as n_abstrs,n.tags as n_tags,n.photo as n_photo,
+		n.author as n_author,n.content as n_content,n.viewNumber as n_viewNumber,n.commentNumber as n_commentNumber,n.createTime as n_createTime,
+		nc.id as nc_id,nc.name as nc_name,nc.sort as nc_sort
+		from news as n,news_category as nc where n.categoryId = nc.id and n.id=#{id} 
+	</select>
+	<!-- 获取符合结果的总记录数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from news where 1 = 1 
+			<if test="name != null">
+			and title like '%${name}%' 
+		</if>
+		
+		<if test="categoryId != null">
+			and categoryId = #{categoryId} 
+		</if>
+	</select>
+	
+	<update id="updateCommentNumber" parameterType="Long">
+	update news set commentNumber = commentNumber + 1 where id = #{id}
+	</update>
+	
+	<update id="updateViewNumber" parameterType="Long">
+	update news set viewNumber = viewNumber + 1 where id = #{id}
+	</update>
+	
+	
+	<select id="findLastCommentList" parameterType="int" resultType="News">
+	select * from news order by  commentNumber desc limit 0,#{pageSize}
+	</select>
+	
+	
+</mapper>
